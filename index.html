@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Navi | Data Engineer & AI Pipeline</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Vue 3 CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            sky: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            },
+            goose: {
+              50: '#fefce8',
+              100: '#fef9c3',
+              200: '#fef08a',
+              300: '#fde047',
+              400: '#facc15',
+              500: '#eab308',
+              600: '#ca8a04',
+              700: '#a16207',
+              800: '#854d0e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    [v-cloak] { display: none; }
+    
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .soft-mesh {
+      background: radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.45) 0px, transparent 50%),
+                  radial-gradient(at 100% 0%, rgba(254, 240, 138, 0.4) 0px, transparent 50%),
+                  radial-gradient(at 50% 100%, rgba(224, 242, 254, 0.3) 0px, transparent 50%);
+    }
+
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .card-clean {
+      background: #ffffff;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 4px 20px -2px rgba(14, 165, 233, 0.05);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .card-clean:hover {
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 12px 28px -4px rgba(14, 165, 233, 0.12);
+      transform: translateY(-2px);
+    }
+
+    /* 彈跳互動按鍵效果 (Spring Bounce & Lift Transition) */
+    .btn-bounce {
+      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, background-color 0.2s ease;
+      will-change: transform;
+    }
+    .btn-bounce:hover {
+      transform: translateY(-5px) scale(1.04);
+      box-shadow: 0 14px 24px -5px rgba(14, 165, 233, 0.3);
+    }
+    .btn-bounce:active {
+      transform: translateY(1px) scale(0.97);
+    }
+
+    .tag-bounce {
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+    }
+    .tag-bounce:hover {
+      transform: translateY(-4px) scale(1.08);
+      border-color: #38bdf8;
+      box-shadow: 0 6px 14px -2px rgba(14, 165, 233, 0.2);
+    }
+  </style>
+</head>
+<body class="selection:bg-sky-200 selection:text-sky-900">
+  <div id="app" v-cloak class="min-h-screen flex flex-col">
+
+    <!-- ==================== NAVIGATION BAR ==================== -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-nav">
+      <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        
+        <!-- Logo -->
+        <a href="#hero" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-sky-400 text-white font-mono font-extrabold flex items-center justify-center shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+            N
+          </div>
+          <div class="flex flex-col leading-tight">
+            <span class="font-bold text-slate-800 tracking-tight text-base">Navi<span class="text-sky-600">.data</span></span>
+            <span class="text-[10px] text-slate-600 font-mono tracking-wider uppercase">Data & AI Pipeline</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-600">
+          <a href="#about" class="hover:text-sky-600 transition-colors">關於我</a>
+          <a href="#skills" class="hover:text-sky-600 transition-colors">技能技術</a>
+          <a href="#projects" class="hover:text-sky-600 transition-colors">專案成果</a>
+          <a href="#experience" class="hover:text-sky-600 transition-colors">歷程培訓</a>
+          <a href="#contact" class="btn-bounce px-4 py-2 rounded-xl bg-sky-500 text-white shadow-sm shadow-sky-500/30">
+            聯絡我
+          </a>
+        </nav>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button 
+          @click="toggleMobileMenu" 
+          class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition" 
+          aria-label="選單開關"
+          :aria-expanded="isMobileMenuOpen"
+        >
+          <i v-if="isMobileMenuOpen" data-lucide="x" class="w-6 h-6"></i>
+          <i v-else data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Dropdown Menu -->
+      <transition 
+        enter-active-class="transition duration-150 ease-out" 
+        enter-from-class="opacity-0 -translate-y-2" 
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-100 ease-in" 
+        leave-from-class="opacity-100 translate-y-0" 
+        leave-to-class="opacity-0 -translate-y-2"
+      >
+        <div v-if="isMobileMenuOpen" class="md:hidden px-6 pt-3 pb-6 bg-white/95 backdrop-blur-md border-b border-slate-200 space-y-3 font-medium text-slate-700">
+          <a href="#about" @click="isMobileMenuOpen = false" class="block py-2 hover:text-sky-600">關於我</a>
+          <a href="#skills" @click="isMobileMenuOpen = false" class="block py-2 hover:text-sky-600">技能技術</a>
+          <a href="#projects" @click="isMobileMenuOpen = false" class="block py-2 hover:text-sky-600">專案成果</a>
+          <a href="#experience" @click="isMobileMenuOpen = false" class="block py-2 hover:text-sky-600">歷程培訓</a>
+          <a href="#contact" @click="isMobileMenuOpen = false" class="block text-center py-2.5 rounded-xl bg-sky-500 text-white font-semibold">
+            聯絡我
+          </a>
+        </div>
+      </transition>
+    </header>
+
+    <main class="flex-grow pt-16">
+      
+      <!-- ==================== HERO SECTION ==================== -->
+      <section id="hero" class="relative soft-mesh pt-20 pb-20 md:pt-28 md:pb-28 border-b border-slate-200/80 overflow-hidden">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+            
+            <!-- Left Bio Intro -->
+            <div class="flex-1 text-center lg:text-left space-y-6">
+              
+              <!-- Status Pill (Sky Blue + Goose Yellow) -->
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-sky-200 text-sky-800 text-xs font-semibold shadow-sm">
+                <span class="w-2.5 h-2.5 rounded-full bg-goose-400 ring-4 ring-goose-100 animate-pulse"></span>
+                <span>求職中：尋找 Data Engineer /  Data Analyst 相關機會</span>
+              </div>
+
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
+                用數據工程釐清痛點，我是 <span class="text-sky-600 relative inline-block">
+                  Navi
+                  <span class="absolute bottom-1.5 left-0 w-full h-3 bg-goose-200/70 -z-10 rounded"></span>
+                </span>
+              </h1>
+
+              <p class="text-lg sm:text-xl font-semibold text-slate-700">
+                Data Engineer  ✕ Data Pipeline 資料工程應用開發
+              </p>
+
+              <p class="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
+                結合<span class="text-slate-900 font-semibold bg-goose-100 px-1 rounded">連鎖餐飲值班經理與咖啡廳店經理</span>的現場商業與管理敏銳度，轉化為穩健的<span class="text-sky-700 font-semibold">資料管線建構、自動化排程 (Airflow) 與容器化 (Docker)</span> 技術。擅長站在使用者與商業角度，打造高可靠度的數據服務。
+              </p>
+
+              <!-- Call to Action Buttons -->
+              <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                <a href="#projects" class="btn-bounce px-6 py-3.5 rounded-xl bg-sky-500 text-white font-semibold flex items-center gap-2 shadow-lg shadow-sky-500/25">
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                  瀏覽代表專案 (含 Tableau)
+                </a>
+                
+                <button 
+                  @click="copyEmail" 
+                  class="btn-bounce px-5 py-3.5 rounded-xl bg-white border border-slate-200 hover:border-sky-300 text-slate-700 font-semibold flex items-center gap-2 shadow-sm"
+                >
+                  <i data-lucide="mail" class="w-4 h-4 text-sky-500"></i>
+                  <span>{{ copyBtnLabel }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Interactive Card (Vue State Card) -->
+            <div class="w-full lg:w-96 flex-shrink-0">
+              <div class="card-clean p-6 rounded-3xl relative overflow-hidden bg-white/95">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-goose-200 to-transparent opacity-50 rounded-bl-full pointer-events-none"></div>
+
+                <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+                  <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold">
+                    <i data-lucide="terminal" class="w-6 h-6"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-800 text-base">技術焦點與身分</h3>
+                    <p class="text-xs text-slate-600 font-mono">Current Focus & Stack</p>
+                  </div>
+                </div>
+
+                <div class="mt-4 space-y-4 text-sm">
+                  <div>
+                    <div class="text-xs text-slate-600 font-medium">主要技術架構（游標滑過觸發彈跳）</div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                      <span 
+                        v-for="tool in primaryStack" 
+                        :key="tool" 
+                        class="tag-bounce inline-block px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-sky-50 text-sky-700 border border-sky-200 shadow-sm"
+                      >
+                        {{ tool }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="pt-2">
+                    <div class="text-xs text-slate-600 font-medium">當前培訓狀態</div>
+                    <div class="mt-1 flex items-center gap-2 text-xs font-semibold text-slate-700 bg-goose-50 border border-goose-200 p-2.5 rounded-xl">
+                      <i data-lucide="book-open" class="w-4 h-4 text-goose-600 flex-shrink-0"></i>
+                      <span>AI新秀-FDE健康科技與智慧製造班 (進修中)</span>
+                    </div>
+                  </div>
+
+                  <div class="pt-2">
+                    <div class="text-xs text-slate-600 font-medium">前瞻專題作品</div>
+                    <p class="text-xs text-slate-600 mt-1">
+                      台北市 12 行政區餐廳評論智慧過濾管線（以 Airflow 與 Python 濾除食物外干擾評價）。
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== ABOUT SECTION ==================== -->
+      <section id="about" class="py-20 max-w-6xl mx-auto px-6">
+        <div class="max-w-2xl mb-12">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-100 text-sky-700 text-xs font-bold tracking-wide uppercase">
+            Story & Value
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900 mt-2">從店務營運視角，賦能現代資料管線</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          <!-- Narrative Box -->
+          <div class="md:col-span-2 card-clean p-8 rounded-3xl space-y-4 text-slate-600 leading-relaxed text-base bg-white">
+            <p>
+              過去在餐飲業擔任<strong class="text-slate-900 font-semibold">連鎖品牌值班經理</strong>及<strong class="text-slate-900 font-semibold">咖啡廳店經理</strong>期間，我每天都處在第一線數據（工時排班、食材進銷存報廢率、顧客即時客訴與 Google 評分）的交會處。這段經驗讓我深知：<span class="text-sky-800 font-semibold bg-sky-50 px-1">「未經處理的資料是雜訊，被正確萃取並自動化的資訊才是核心資產。」</span>
+            </p>
+            <p>
+              為了從根本解決資訊不對稱與營運瓶頸，我全力投入資料工程技術的學習。今年 4 月，我以扎實的時間投入<strong class="text-slate-900">緯育 TibaMe 雲端資料工程師培訓班（全日密集超過三個月）</strong>，從 0 到 1 掌握了 Python 爬蟲與資料清洗、MySQL 結構建模、Apache Airflow 定時 DAG 排程、以及 Docker 容器部署。
+            </p>
+            <p>
+              結訓後，我繼續接軌參與<strong class="text-slate-900 font-semibold">「AI新秀 - FDE 健康科技與智慧製造應用班」</strong>，進一步擴展對機器學習在智慧製造領域管線部署的深度理解，致力成為兼具<strong class="text-sky-700 font-semibold">商業同理心</strong>與<strong class="text-sky-700 font-semibold">穩定技術交付力</strong>的資料工程師。
+            </p>
+          </div>
+
+          <!-- Feature Cards -->
+          <div class="space-y-4">
+            
+            <div class="card-clean p-6 rounded-2xl border-l-4 border-l-sky-500 bg-white">
+              <div class="flex items-center gap-2 text-sky-700 font-bold text-sm mb-1">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+                清晰的商業轉譯能力
+              </div>
+              <p class="text-xs text-slate-500 leading-normal">
+                深諳營運部門的非技術語言，能精準洞悉使用者真正的問題，不只寫程式，更能打造符合商務期待的 ETL 流程。
+              </p>
+            </div>
+
+            <div class="card-clean p-6 rounded-2xl border-l-4 border-l-goose-400 bg-white">
+              <div class="flex items-center gap-2 text-goose-700 font-bold text-sm mb-1">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                高抗壓與流程可靠度
+              </div>
+              <p class="text-xs text-slate-500 leading-normal">
+                具備門市現場多工處置與即時危機排查經驗，對於資料工程的例外處理、日誌監控與任務重試抱持高度嚴謹態度。
+              </p>
+            </div>
+
+            <div class="card-clean p-6 rounded-2xl border-l-4 border-l-sky-400 bg-white">
+              <div class="flex items-center gap-2 text-sky-700 font-bold text-sm mb-1">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                持續進階的學習動能
+              </div>
+              <p class="text-xs text-slate-500 leading-normal">
+                緊接著雲端資料工程培訓後無縫投入 AI 新秀專班，積極掌握新技術生態與產線應用，學習曲線敏捷迅速。
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== SKILLS SECTION (VUE FILTERABLE) ==================== -->
+      <section id="skills" class="py-20 bg-slate-100/70 border-y border-slate-200">
+        <div class="max-w-6xl mx-auto px-6">
+          
+          <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-goose-200 text-goose-800 text-xs font-bold tracking-wide uppercase">
+                Technical Stack
+              </div>
+              <h2 class="text-3xl font-extrabold text-slate-900 mt-2">核心技術矩陣</h2>
+              <p class="text-slate-600 text-sm mt-1">依據資料生命週期劃分之工程實作技能</p>
+            </div>
+
+            <!-- Vue Skill Category Filter Tabs -->
+            <div class="flex flex-wrap gap-2">
+              <button 
+                v-for="cat in skillCategories" 
+                :key="cat.id"
+                @click="activeSkillCategory = cat.id"
+                :class="[
+                  'btn-bounce px-4 py-2 rounded-xl text-xs font-semibold transition-all',
+                  activeSkillCategory === cat.id 
+                    ? 'bg-sky-500 text-white shadow-md shadow-sky-500/30' 
+                    : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                ]"
+              >
+                {{ cat.name }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtered Skills Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div 
+              v-for="skill in filteredSkills" 
+              :key="skill.title" 
+              class="card-clean p-6 rounded-2xl bg-white flex flex-col justify-between"
+            >
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="px-2.5 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-sky-50 text-sky-700 border border-sky-100">
+                    {{ skill.categoryName }}
+                  </span>
+                  <div class="w-8 h-8 rounded-lg bg-goose-100 text-goose-700 flex items-center justify-center">
+                    <i :data-lucide="skill.icon" class="w-4 h-4"></i>
+                  </div>
+                </div>
+                
+                <h3 class="text-base font-bold text-slate-800 mb-2">{{ skill.title }}</h3>
+                <p class="text-xs text-slate-500 leading-relaxed mb-4">{{ skill.desc }}</p>
+              </div>
+
+              <!-- Skill Tags -->
+              <div class="flex flex-wrap gap-1.5 pt-3 border-t border-slate-100">
+                <span 
+                  v-for="tag in skill.tags" 
+                  :key="tag" 
+                  class="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-100 text-slate-600"
+                >
+                  #{{ tag }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== FEATURED PROJECT SECTION ==================== -->
+      <section id="projects" class="py-20 max-w-6xl mx-auto px-6">
+        <div class="max-w-2xl mb-12">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-100 text-sky-700 text-xs font-bold tracking-wide uppercase">
+            Capstone Showcase
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900 mt-2">精選代表專案</h2>
+          <p class="text-slate-600 text-sm mt-1">針對台北市餐飲評價失真之商業痛點，所構建之自動化過濾與評分平反管線</p>
+        </div>
+
+        <!-- Main Project Card -->
+        <div class="card-clean rounded-3xl bg-white overflow-hidden border border-slate-200">
+          <div class="p-8 lg:p-10 space-y-8">
+            
+            <!-- Header Info -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-goose-100 border border-goose-200 text-goose-800 text-xs font-semibold">
+                  <i data-lucide="award" class="w-3.5 h-3.5 text-goose-600"></i>
+                  緯育 TibaMe 雲端資料工程班・結訓專題代表作
+                </div>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">
+                  台北市 12 行政區餐廳評論篩選與評價平反平台
+                </h3>
+              </div>
+
+              <!-- Tech Badges -->
+              <div class="flex flex-wrap gap-2 self-start md:self-auto">
+                <span class="tag-bounce px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 font-mono text-xs font-bold border border-sky-200">Python</span>
+                <span class="tag-bounce px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 font-mono text-xs font-bold border border-sky-200">MySQL</span>
+                <span class="tag-bounce px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 font-mono text-xs font-bold border border-sky-200">Airflow</span>
+                <span class="tag-bounce px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 font-mono text-xs font-bold border border-sky-200">Docker</span>
+                <span class="tag-bounce px-3 py-1.5 rounded-xl bg-goose-100 text-amber-800 font-mono text-xs font-bold border border-goose-300">Tableau BI</span>
+              </div>
+            </div>
+
+            <!-- Tableau Interactive Mock Section inside Project -->
+            <div class="p-6 rounded-2xl bg-gradient-to-br from-sky-50/70 via-white to-goose-50/60 border border-sky-200/70 shadow-sm space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-800">Tableau 商業智慧儀表板視覺化</h4>
+                    <p class="text-xs text-slate-500">台北 12 行政區評價降噪成果對比切換</p>
+                  </div>
+                </div>
+
+                <!-- Interactive View Toggle -->
+                <div class="flex gap-1.5 bg-slate-100 p-1 rounded-xl">
+                  <button 
+                    @click="activeDistrictTab = 'all'" 
+                    :class="['btn-bounce px-3 py-1 rounded-lg text-xs font-bold transition-all', activeDistrictTab === 'all' ? 'bg-white text-sky-600 shadow-sm' : 'text-slate-600']"
+                  >
+                    全區總覽
+                  </button>
+                  <button 
+                    @click="activeDistrictTab = 'filtered'" 
+                    :class="['btn-bounce px-3 py-1 rounded-lg text-xs font-bold transition-all', activeDistrictTab === 'filtered' ? 'bg-white text-amber-600 shadow-sm' : 'text-slate-600']"
+                  >
+                    平反前後對比
+                  </button>
+                </div>
+              </div>
+
+              <!-- Interactive Dashboard Stats Cards (Simulated Tableau KPIs) -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 hover:border-sky-300 transition shadow-sm">
+                  <span class="text-[11px] font-mono text-slate-500 uppercase">涵蓋行政區</span>
+                  <div class="text-2xl font-extrabold text-sky-600 mt-1">12 區</div>
+                  <span class="text-[11px] text-slate-400">大安/信義/中山等完整納入</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 hover:border-amber-300 transition shadow-sm">
+                  <span class="text-[11px] font-mono text-slate-500 uppercase">被濾除非食物雜訊</span>
+                  <div class="text-2xl font-extrabold text-amber-500 mt-1">32.8%</div>
+                  <span class="text-[11px] text-slate-400">排除車位、冷氣、排隊等外在因素</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 hover:border-sky-300 transition shadow-sm">
+                  <span class="text-[11px] font-mono text-slate-500 uppercase">店家平均評分回升</span>
+                  <div class="text-2xl font-extrabold text-emerald-600 mt-1">+0.42 ★</div>
+                  <span class="text-[11px] text-slate-400">客觀還原真實美味料理評價</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Problem & Solution Comparison -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="p-6 rounded-2xl bg-amber-50/50 border border-amber-200/80">
+                <div class="flex items-center gap-2 text-amber-800 font-bold text-sm mb-2">
+                  <i data-lucide="help-circle" class="w-4 h-4 text-amber-600"></i>
+                  產業真實痛點 (The Problem)
+                </div>
+                <p class="text-sm text-slate-700 leading-relaxed">
+                  台北市大量餐飲店家常因「難停車、冷氣不夠強、候位久、外送包材問題」等非餐點核心因素收到一星差評。這些外部噪訊稀釋了真實的料理品質，導致真正用心經營的好餐廳在演算法與搜尋結果中被誤殺。
+                </p>
+              </div>
+
+              <div class="p-6 rounded-2xl bg-sky-50/60 border border-sky-200/80">
+                <div class="flex items-center gap-2 text-sky-800 font-bold text-sm mb-2">
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-sky-600"></i>
+                  工程端解方 (The Solution)
+                </div>
+                <p class="text-sm text-slate-700 leading-relaxed">
+                  建立全流程資料管線：系統性抓取 12 行政區數萬筆餐廳文字評論，運用自定義規則庫與特徵工程，抽離與食物無關之負評因子，重構客觀之「食物真實評價模型」，並將清洗成果妥善存入 MySQL。
+                </p>
+              </div>
+            </div>
+
+            <!-- Architecture Step Flow -->
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <div class="text-xs font-mono font-semibold text-slate-500 uppercase tracking-wider">
+                  // 端到端資料管線架構 (Pipeline Flow)
+                </div>
+                <button 
+                  @click="toggleProjectDetails" 
+                  class="text-xs font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1"
+                >
+                  <span>{{ isProjectExpanded ? '收合技術細節' : '展開完整技術細節' }}</span>
+                  <i data-lucide="chevron-down" :class="{ 'rotate-180': isProjectExpanded }" class="w-3.5 h-3.5 transition-transform"></i>
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center">
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center">
+                  <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs mb-2">1</div>
+                  <h4 class="text-xs font-bold text-slate-800">資料蒐集</h4>
+                  <p class="text-[11px] text-slate-500 mt-1">12 行政區店家評論批次爬取</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center">
+                  <div class="w-8 h-8 rounded-full bg-goose-200 text-goose-800 flex items-center justify-center font-bold text-xs mb-2">2</div>
+                  <h4 class="text-xs font-bold text-slate-800">降噪與特徵過濾</h4>
+                  <p class="text-[11px] text-slate-500 mt-1">過濾非餐飲干擾字詞與雜音</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center">
+                  <div class="w-8 h-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-xs mb-2">3</div>
+                  <h4 class="text-xs font-bold text-slate-800">Airflow DAG 編排</h4>
+                  <p class="text-[11px] text-slate-500 mt-1">排程自動化監控與失敗重試</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center">
+                  <div class="w-8 h-8 rounded-full bg-goose-200 text-goose-800 flex items-center justify-center font-bold text-xs mb-2">4</div>
+                  <h4 class="text-xs font-bold text-slate-800">重算分與模型入庫</h4>
+                  <p class="text-[11px] text-slate-500 mt-1">結構化儲存至 MySQL 供查詢</p>
+                </div>
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center sm:col-span-4 mt-2">
+                  <div class="w-8 h-8 rounded-full bg-sky-200 text-sky-800 flex items-center justify-center font-bold text-xs mb-2">5</div>
+                  <h4 class="text-xs font-bold text-slate-800">Tableau 視覺化呈現</h4>
+                  <p class="text-[11px] text-slate-500 mt-1">建立 12 行政區互動熱點地圖與平反前後情緒指標儀表板</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Vue Expandable Technical Details -->
+            <transition
+              enter-active-class="transition duration-200 ease-out"
+              enter-from-class="opacity-0 -translate-y-2"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition duration-150 ease-in"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 -translate-y-2"
+            >
+              <div v-if="isProjectExpanded" class="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                  <i data-lucide="code" class="w-4 h-4 text-sky-600"></i>
+                  專案實作技術亮點 (Technical Implementation)
+                </h4>
+                <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside leading-relaxed">
+                  <li><strong class="text-slate-800">文字清洗策略：</strong>運用 Python 正則表達式與語意斷詞，針對「停車、冷氣、排隊、外送員」等維度建立權重排除規則，計算食物相關評論純度。</li>
+                  <li><strong class="text-slate-800">資料庫正規化設計：</strong>建立包含店家基本資料表、行政區索引表、原始評論表與過濾重算歷史表的關聯式架構，優化查詢效能。</li>
+                  <li><strong class="text-slate-800">Airflow 工作流容錯機制：</strong>透過 Airflow DAG 劃分各階段任務依賴性，加入 Task 回報與重試次數設定，提升排程韌性。</li>
+                  <li><strong class="text-slate-800">Docker 環境封裝：</strong>撰寫 Dockerfile 與 docker-compose.yml 將 Airflow Webserver, Scheduler 與 MySQL 容器化，達成快速啟動與跨機一致性。</li>
+                  <li><strong class="text-slate-800">Tableau 決策儀表板：</strong>連接 MySQL 產出台北市地理分布圖與情緒差異對比圖表，讓餐廳經理人一鍵洞察被誤判星等的料理品項。</li>
+                </ul>
+              </div>
+            </transition>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== EXPERIENCE & TIMELINE ==================== -->
+      <section id="experience" class="py-20 bg-slate-100/70 border-t border-slate-200">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="max-w-2xl mb-12">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-sky-100 text-sky-700 text-xs font-bold tracking-wide uppercase">
+              Growth & Milestones
+            </div>
+            <h2 class="text-3xl font-extrabold text-slate-900 mt-2">經歷與培訓歷程</h2>
+            <p class="text-slate-600 text-sm mt-1">從管理實踐到密集技術淬鍊的轉型軌跡</p>
+          </div>
+
+          <div class="relative border-l-2 border-sky-200 ml-4 md:ml-6 space-y-12">
+            
+            <!-- Timeline Item 1: AI Newcomer -->
+            <div class="relative pl-8 md:pl-10 group">
+              <span class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-goose-400 border-4 border-white shadow"></span>
+              
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  AI新秀 - FDE健康科技與智慧製造應用班
+                  <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-goose-100 text-goose-800 border border-goose-300 font-semibold">進修培訓中</span>
+                </h3>
+                <span class="text-xs font-mono text-slate-500">Present</span>
+              </div>
+              
+              <p class="text-sm font-semibold text-sky-600 mt-1">智慧製造實務 ✕ 機器學習應用部署落地思維</p>
+              <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                結訓雲端資料工程後持續進階，深入智慧產線與健康醫療資料的特徵工程、邊緣端推論概念及資料管線與 AI 模型的串接整合，強化自身在工業與健康場域的跨域應用實力。
+              </p>
+            </div>
+
+            <!-- Timeline Item 2: TibaMe -->
+            <div class="relative pl-8 md:pl-10 group">
+              <span class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-sky-500 border-4 border-white shadow"></span>
+              
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <h3 class="text-lg font-bold text-slate-800">
+                  緯育 TibaMe - 雲端資料工程師培訓班
+                </h3>
+                <span class="text-xs font-mono text-slate-500">4 月 - 7 月 (3個多月密集培訓)</span>
+              </div>
+              
+              <p class="text-sm font-semibold text-sky-600 mt-1">全方位資料工程・ETL/ELT 管線・容器化與排程架構</p>
+              <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                經歷數百小時高強度密集訓練，完整涵蓋 Python 進階數據處理、關聯式資料庫 MySQL 設計、Apache Airflow 任務自動化與 Docker 容器化部屬，並完成台北市餐廳評論專案開發。
+              </p>
+            </div>
+
+            <!-- Timeline Item 3: Shift Manager & Cafe Manager -->
+            <div class="relative pl-8 md:pl-10 group">
+              <span class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-slate-300 border-4 border-white shadow"></span>
+              
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <h3 class="text-lg font-bold text-slate-800">
+                  知名咖啡廳店經理 / 餐飲業值班經理
+                </h3>
+                <span class="text-xs font-mono text-slate-500">多年門市管理實務</span>
+              </div>
+              
+              <p class="text-sm font-semibold text-slate-700 mt-1">團隊組織帶領・門市損益控制・即時客訴與危機處理</p>
+              <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                負責現場多項營運指標控管，建立門市作業標準化流程（SOP），並具備跨部門與高壓現場的溝通協調力，為日後技術專案的邏輯推演與問題解決打下厚實的人格特質基石。
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== CONTACT SECTION ==================== -->
+      <section id="contact" class="py-20 max-w-4xl mx-auto px-6 text-center">
+        <div class="card-clean p-10 md:p-14 rounded-3xl bg-white border border-slate-200 relative overflow-hidden">
+          
+          <!-- Top Accent Light -->
+          <div class="absolute -top-12 left-1/2 -translate-x-1/2 w-80 h-32 bg-sky-200/50 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div class="max-w-xl mx-auto space-y-6 relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-goose-100 text-goose-800 text-xs font-bold uppercase tracking-wider">
+              Get In Touch
+            </div>
+            
+            <h2 class="text-3xl font-extrabold text-slate-900">
+              誠摯期待能為您的工程團隊帶來價值
+            </h2>
+            
+            <p class="text-slate-600 text-sm leading-relaxed">
+              如果您正在尋找兼具「業務同理心」與「資料工程實作力」的夥伴，歡迎隨時透過 Email 與我聯繫！
+            </p>
+
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button 
+                @click="copyEmail" 
+                class="btn-bounce w-full sm:w-auto px-6 py-3.5 rounded-xl bg-sky-500 text-white font-semibold flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25"
+              >
+                <i data-lucide="mail" class="w-4 h-4"></i>
+                <span>{{ copyBtnLabel }}</span>
+              </button>
+              
+              <a 
+                href="https://github.com/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="btn-bounce w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold flex items-center justify-center gap-2 border border-slate-200"
+              >
+                <i data-lucide="github" class="w-4 h-4"></i>
+                前往 GitHub
+              </a>
+            </div>
+
+            <!-- Reactive Toast Message -->
+            <transition
+              enter-active-class="transition duration-200 ease-out"
+              enter-from-class="opacity-0 scale-95"
+              enter-to-class="opacity-100 scale-100"
+              leave-active-class="transition duration-150 ease-in"
+              leave-from-class="opacity-100 scale-100"
+              leave-to-class="opacity-0 scale-95"
+            >
+              <div v-if="showToast" class="inline-block px-4 py-2 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 text-xs font-semibold">
+                ✓ 已成功複製 Email：{{ contactEmail }}
+              </div>
+            </transition>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
+      <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p>© 2026 Navi. Designed with Vue 3 & Tailwind CSS. Ready for GitHub Pages.</p>
+        <div class="flex items-center gap-6">
+          <a href="#hero" class="hover:text-sky-600 transition-colors">回到頁首</a>
+          <a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="hover:text-sky-600 transition-colors">GitHub Profile</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== VUE 3 APPLICATION ==================== -->
+  <script>
+    const { createApp, ref, computed, onMounted, onUpdated } = Vue;
+
+    createApp({
+      setup() {
+        // Contact state
+        const contactEmail = ref("navi.data.dev@gmail.com"); // 替換為您的真實信箱
+        const copyBtnLabel = ref("複製 Email 信箱");
+        const showToast = ref(false);
+
+        // Mobile drawer state
+        const isMobileMenuOpen = ref(false);
+        const toggleMobileMenu = () => {
+          isMobileMenuOpen.value = !isMobileMenuOpen.value;
+        };
+
+        // Project detail expander state
+        const isProjectExpanded = ref(false);
+        const toggleProjectDetails = () => {
+          isProjectExpanded.value = !isProjectExpanded.value;
+        };
+
+        // Tableau interactive tab state
+        const activeDistrictTab = ref("all");
+
+        // Primary stack overview for hero card (including Tableau)
+        const primaryStack = ref([
+          "Python", "MySQL", "Airflow", "Docker", "Tableau", "Pandas", "ETL Pipelines", "Git"
+        ]);
+
+        // Skills with categorization (including Tableau BI)
+        const skillCategories = ref([
+          { id: "all", name: "全部技能" },
+          { id: "pipeline", name: "ETL & 排程" },
+          { id: "bi", name: "視覺化 & 商業分析" },
+          { id: "database", name: "資料庫" },
+          { id: "devops", name: "容器與版本控制" }
+        ]);
+
+        const activeSkillCategory = ref("all");
+
+        const allSkills = ref([
+          {
+            category: "pipeline",
+            categoryName: "ETL & 排程",
+            icon: "workflow",
+            title: "Apache Airflow 自動化編排",
+            desc: "設計定時執行的 DAG 工作流，負責任務依賴設定、資料抽取、清洗觸發與日誌錯誤監控。",
+            tags: ["Airflow", "DAGs", "Batch ETL", "Scheduling"]
+          },
+          {
+            category: "bi",
+            categoryName: "視覺化 & 商業分析",
+            icon: "bar-chart-3",
+            title: "Tableau 商業智慧儀表板",
+            desc: "設計多維度互動式儀表板，將資料庫數據轉化為地理分佈圖、評分趨勢與情緒對比視覺化報表。",
+            tags: ["Tableau", "Data Visualization", "BI Dashboard", "Storytelling"]
+          },
+          {
+            category: "pipeline",
+            categoryName: "程式語言 & 腳本",
+            icon: "code-2",
+            title: "Python 資料處理與爬蟲",
+            desc: "熟練使用 Pandas、Requests 與 BeautifulSoup 進行網路資料擷取、結構清洗與特徵降噪處理。",
+            tags: ["Python", "Pandas", "Web Scraping", "Data Cleansing"]
+          },
+          {
+            category: "database",
+            categoryName: "資料庫與儲存",
+            icon: "database",
+            title: "MySQL 關聯模型設計",
+            desc: "設計第三正規化資料表架構，撰寫多表關聯（JOIN）與彙總分析查詢，建立索引提升查詢效率。",
+            tags: ["MySQL", "Relational Schema", "Index Optimization", "SQL"]
+          },
+          {
+            category: "devops",
+            categoryName: "容器與部屬",
+            icon: "box",
+            title: "Docker 容器化環境封裝",
+            desc: "將資料管線程式碼與 Airflow 服務進行 Docker 映像檔打包，以 Compose 實現一鍵跨機運行。",
+            tags: ["Docker", "Docker-Compose", "Containerization"]
+          },
+          {
+            category: "devops",
+            categoryName: "版本協同",
+            icon: "git-branch",
+            title: "Git / GitHub 版本控制",
+            desc: "掌握分支管理（Branching）、變更提交（Commit）與 Pull Request 審查流程，便於團隊協作。",
+            tags: ["Git", "GitHub", "Version Control"]
+          },
+          {
+            category: "pipeline",
+            categoryName: "AI 新秀應用",
+            icon: "cpu",
+            title: "智慧製造與模型管線對接",
+            desc: "於 FDE AI 新秀班持續精進製造業與健康領域的感測特徵工程與機器學習模型落地流程思維。",
+            tags: ["Smart Manufacturing", "Machine Learning Pipeline", "Health Tech"]
+          }
+        ]);
+
+        // Filtered skills by category
+        const filteredSkills = computed(() => {
+          if (activeSkillCategory.value === "all") {
+            return allSkills.value;
+          }
+          return allSkills.value.filter(s => s.category === activeSkillCategory.value);
+        });
+
+        // Copy email helper
+        let copyFeedbackTimer;
+        const copyEmail = async () => {
+          try {
+            if (window.isSecureContext && navigator.clipboard) {
+              await navigator.clipboard.writeText(contactEmail.value);
+            } else {
+              const tempInput = document.createElement("textarea");
+              tempInput.value = contactEmail.value;
+              tempInput.setAttribute("readonly", "");
+              tempInput.style.position = "fixed";
+              tempInput.style.opacity = "0";
+              document.body.appendChild(tempInput);
+              tempInput.select();
+              const copied = document.execCommand("copy");
+              document.body.removeChild(tempInput);
+              if (!copied) {
+                throw new Error("The browser did not copy the email address.");
+              }
+            }
+            copyBtnLabel.value = "已成功複製！";
+            showToast.value = true;
+          } catch (error) {
+            console.error("Failed to copy email address:", error);
+            copyBtnLabel.value = "複製失敗，請手動寄信";
+            showToast.value = false;
+          }
+
+          window.clearTimeout(copyFeedbackTimer);
+          copyFeedbackTimer = window.setTimeout(() => {
+            copyBtnLabel.value = "複製 Email 信箱";
+            showToast.value = false;
+          }, 4000);
+        };
+
+        onMounted(() => {
+          lucide.createIcons();
+        });
+
+        onUpdated(() => {
+          lucide.createIcons();
+        });
+
+        return {
+          contactEmail,
+          copyBtnLabel,
+          showToast,
+          isMobileMenuOpen,
+          toggleMobileMenu,
+          isProjectExpanded,
+          toggleProjectDetails,
+          activeDistrictTab,
+          primaryStack,
+          skillCategories,
+          activeSkillCategory,
+          filteredSkills,
+          copyEmail
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
